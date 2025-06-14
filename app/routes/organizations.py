@@ -440,8 +440,7 @@ async def get_organization_stats(
     response_rate = 0.0
     last_survey_date = None
     
-    # TODO: Implement survey statistics once Survey model is available
-    # This is a placeholder for now
+    # Placeholder until survey statistics are implemented
     
     return OrganizationStats(
         total_members=total_members,

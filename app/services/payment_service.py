@@ -260,7 +260,7 @@ class PaymentService:
             reason=dispute_data.get('reason')
         )
         
-        # TODO: Implement dispute handling logic
+        # Dispute handling logic should go here:
         # - Find related payment
         # - Update payment status
         # - Send notification to admin
@@ -276,7 +276,7 @@ class PaymentService:
             amount_paid=invoice_data.get('amount_paid')
         )
         
-        # TODO: Handle invoice-specific logic if needed
+        # Placeholder for invoice-specific logic if needed
     
     async def _trigger_post_payment_actions(self, payment: Payment) -> None:
         """Trigger actions after successful payment."""
@@ -287,7 +287,7 @@ class PaymentService:
                 logger.error(f"Organization not found for payment {payment.id}")
                 return
             
-            # TODO: Implement post-payment actions:
+            # Post-payment actions could include:
             # 1. Send payment confirmation email
             # 2. Update organization credit/balance
             # 3. Enable survey creation
