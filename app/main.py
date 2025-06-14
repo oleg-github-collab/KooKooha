@@ -13,7 +13,7 @@ import structlog
 
 from .config import settings
 from .database import create_db_and_tables
-from .routes import auth, organizations, surveys, responses, analytics, payments, admin
+from .routes import auth, organizations, surveys, responses, payments, admin
 from .services.scheduler import scheduler
 
 
@@ -182,7 +182,6 @@ app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(organizations.router, prefix="/api/v1/organizations", tags=["Organizations"])
 app.include_router(surveys.router, prefix="/api/v1/surveys", tags=["Surveys"])
 app.include_router(responses.router, prefix="/api/v1/responses", tags=["Responses"])
-app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
 app.include_router(payments.router, prefix="/api/v1/payments", tags=["Payments"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 
@@ -199,8 +198,10 @@ if frontend_path.exists():
     app.mount("/app", StaticFiles(directory="frontend", html=True), name="frontend")
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Run the FastAPI application with Uvicorn."""
     import uvicorn
+
     uvicorn.run(
         "app.main:app",
         host=settings.host,
@@ -208,3 +209,7 @@ if __name__ == "__main__":
         reload=settings.debug,
         log_level=settings.log_level.lower(),
     )
+
+
+if __name__ == "__main__":
+    main()
