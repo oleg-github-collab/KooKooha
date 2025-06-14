@@ -1239,4 +1239,4 @@ window.proceedToCheckout = proceedToCheckout;
 window.playDemo = playDemo;
 window.submitContactForm = submitContactForm;
 window.joinWaitlist = joinWaitlist;
-window.subscribeNewsletter = subscribeNewsletter;
+
