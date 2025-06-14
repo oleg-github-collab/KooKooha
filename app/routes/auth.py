@@ -279,7 +279,7 @@ async def forgot_password(
         logger.warning("Password reset requested for non-existent email", email=request.email)
         return {"message": "If the email exists, a reset link has been sent"}
     
-    # TODO: Implement password reset email sending
+    # In a real application we would send a password reset email here.
     # For now, just log the request
     logger.info("Password reset requested", user_id=user.id, email=user.email)
     

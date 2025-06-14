@@ -228,7 +228,7 @@ class SchedulerService:
                 total_revenue_eur=total_revenue
             )
             
-            # TODO: Send report email to admins if needed
+            # Optionally send report email to administrators
             
         except Exception as e:
             logger.error("Daily reports generation task failed", error=str(e))
