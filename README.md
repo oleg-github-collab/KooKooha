@@ -4,6 +4,11 @@
 
 Human Lens is a comprehensive API platform for conducting sociometric analysis, 360-degree reviews, eNPS surveys, and team dynamics assessments. Built with modern Python technologies and designed for scalability, privacy, and actionable insights.
 
+Additional documentation is available in the `docs` directory:
+- [Deployment Guide](docs/DEPLOYMENT.md)
+- [Environment Variables](docs/ENVIRONMENT.md)
+- [API Overview](docs/ENDPOINTS.md)
+
 ## 🚀 Features
 
 ### Core Functionality
