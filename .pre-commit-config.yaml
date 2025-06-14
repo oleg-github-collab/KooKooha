@@ -1,0 +1,225 @@
+repos:
+  # Pre-commit hooks for basic file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-xml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: debug-statements
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: detect-private-key
+
+  # Python code formatting with Black
+  - repo: https://github.com/psf/black
+    rev: 23.11.0
+    hooks:
+      - id: black
+        language_version: python3.12
+        args: [--line-length=100]
+
+  # Import sorting with isort
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=100]
+
+  # Linting with Ruff (faster alternative to flake8)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.6
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+  # Type checking with MyPy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.7.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [
+          types-requests,
+          types-python-dateutil,
+          types-setuptools,
+          pydantic,
+          sqlmodel,
+          fastapi,
+        ]
+        args: [--ignore-missing-imports, --show-error-codes]
+
+  # Security checks with Bandit
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [-r, app/, -f, json, -o, security-report.json]
+        pass_filenames: false
+
+  # Dependency vulnerability checks with Safety
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.2
+    hooks:
+      - id: python-safety-dependencies-check
+        files: requirements.*\.txt$
+
+  # Dockerfile linting (if Docker is used in future)
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        args: [--ignore, DL3008, --ignore, DL3009]
+
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        args: [-e, SC1091]
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.37.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: [-d, relaxed]
+
+  # Check for secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+        exclude: package.lock.json
+
+  # SQL formatting (if direct SQL is used)
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 2.3.5
+    hooks:
+      - id: sqlfluff-lint
+        additional_dependencies: [sqlfluff-templater-jinja]
+      - id: sqlfluff-fix
+        additional_dependencies: [sqlfluff-templater-jinja]
+
+  # Python docstring formatting
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        additional_dependencies: [tomli]
+        args: [--convention=google]
+
+  # Check requirements.txt
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+    rev: v1.1.2
+    hooks:
+      - id: dockerfile_lint
+        files: Dockerfile.*
+
+  # Local hooks for custom checks
+  - repo: local
+    hooks:
+      # Check for print statements (should use logging)
+      - id: check-print-statements
+        name: Check for print statements
+        entry: bash -c 'if grep -r "print(" app/ --include="*.py" --exclude-dir=tests; then echo "Use logging instead of print statements"; exit 1; fi'
+        language: system
+        pass_filenames: false
+
+      # Check for TODO comments in production code
+      - id: check-todos
+        name: Check for TODO comments
+        entry: bash -c 'if grep -r "TODO\|FIXME\|XXX" app/ --include="*.py" --exclude-dir=tests; then echo "Remove TODO/FIXME comments before commit"; exit 1; fi'
+        language: system
+        pass_filenames: false
+
+      # Check environment variables are documented
+      - id: check-env-vars
+        name: Check environment variables documentation
+        entry: bash -c 'python scripts/check_env_vars.py'
+        language: system
+        pass_filenames: false
+        files: ^(app/config\.py|\.env\.example)$
+
+      # Run tests before commit
+      - id: run-tests
+        name: Run tests
+        entry: make test-quick
+        language: system
+        pass_filenames: false
+        stages: [commit]
+
+      # Check API documentation is up to date
+      - id: check-api-docs
+        name: Check API documentation
+        entry: bash -c 'python scripts/check_api_docs.py'
+        language: system
+        pass_filenames: false
+        files: ^app/routes/.*\.py$
+
+# Global configuration
+default_stages: [commit]
+fail_fast: false
+minimum_pre_commit_version: 3.0.0
+
+# Define which hooks to skip for certain file types
+exclude: |
+  (?x)^(
+      \.git/|
+      \.tox/|
+      \.venv/|
+      venv/|
+      \.pytest_cache/|
+      __pycache__/|
+      \.mypy_cache/|
+      htmlcov/|
+      \.coverage|
+      data/|
+      logs/|
+      backups/|
+      emergency-backups/|
+      .*\.db$|
+      .*\.sqlite$|
+      .*\.log$
+  )
+
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+    
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: [
+    bandit,
+    python-safety-dependencies-check,
+    run-tests,
+    shellcheck,
+    hadolint-docker,
+    sqlfluff-lint,
+    sqlfluff-fix,
+    dockerfile_lint,
+    check-env-vars,
+    check-api-docs,
+  ]
+  submodules: false
